@@ -21,6 +21,37 @@ function main() {
   
   //各商品の投稿に対して、付けられたreactionをチェック
   var messagesNum = his.length;
+  
+  for(var i in his){
+    var price = (his[i].text).split(" ");
+    if(his[i].reactions != null){
+      for(var j in his[i].reactions){
+        for(var l in his[i].reactions[j].users){
+          //reactionを付けたユーザーの残高を引く
+          var indexNum = arrayParse(member).indexOf(his[i].reactions[j].users[l]);
+          
+          //bot自身のreactionはindexOfが-1なので除外
+          if(indexNum>=0){
+            money[indexNum] = money[indexNum] - price[1];
+            postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+price[1]+"]");
+            postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+price[1]+"]");
+          
+            sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
+          }
+        }
+      }
+      //必ずbotが1つreactionを付けているので、それを無視するようにして購入があった投稿を再投稿
+      if((his[i].reactions.length!=1)||(his[i].reactions[j].users.length!=1)){        
+        var messageCache = his[i].text;
+        app.chatDelete(channel, his[i].ts); 
+        postMessage(channel, messageCache);
+        var newMessage = app.channelsHistory(channel,{"count":1}).messages;
+        addEmoji(token,channel,newMessage[0].ts);
+      }
+    }
+  }
+  
+  /*
   for(var i=0; i<messagesNum ;i++){
     var price = (his[i].text).split(" ");
     if(his[i].reactions != null){
@@ -52,6 +83,7 @@ function main() {
       }
     }
   }
+  */
 }
 
 

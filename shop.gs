@@ -66,26 +66,6 @@ function postMessage(id,message){
   });
 }
 
-function removeEmoji(token, channel, timestamp, name){
-  var method = "post";
-  var url = "https://slack.com/api/reactions.remove"
-  
-  //slackAppが対応していない制御用
-  var payload = {
-    'token'      : token,
-    'channel'    : channel,
-    'timestamp'  : timestamp,
-    'name'       : name
-  };
- 
-  var params = {
-    'method' : method,
-    'payload' : payload
-  };
-  
-  return UrlFetchApp.fetch(url, params);
-}
-
 function addEmoji(token, channel, timestamp){
   var method = "post";
   var url = "https://slack.com/api/reactions.add"

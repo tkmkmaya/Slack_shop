@@ -1,4 +1,4 @@
-# Awesome-name
+# Slack Shop with GAS
 
 ![Badge Status](https://ci-as-a-service)
 
@@ -21,12 +21,6 @@ just to select the item on the shop channel and press the purchase button!
 
 - Google AppScript
 - SlackApp(GAS Library: https://qiita.com/soundTricker/items/43267609a870fc9c7453)
-
-## Usage
-
-1. Usage
-2. Usage
-3. Usage
 
 ## Author
 

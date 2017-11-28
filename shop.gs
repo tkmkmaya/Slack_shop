@@ -8,7 +8,6 @@ function main() {
 
   //購買チャンネルのログを取得
   var his = app.channelsHistory(channel,{"count":100}).messages;
-  
   var message = "";
   
   //spreadsheetの読み込み
@@ -19,18 +18,16 @@ function main() {
 　var money = sheet.getSheetValues(1, 2, lastrow, 1); //データ行のみを取得する
   var money_old = money.slice(0, money.length);
   
-  //各商品の投稿に対して、付けられたreactionをチェック
-  var messagesNum = his.length;
-  
   for(var i in his){
+    //商品名や価格を投稿のテキスト情報から取得
     var price = (his[i].text).split(" ");
     if(his[i].reactions != null){
       for(var j in his[i].reactions){
         for(var l in his[i].reactions[j].users){
-          //reactionを付けたユーザーの残高を引く
+          //reactionを付けたユーザーのインデックスを調べる
           var indexNum = arrayParse(member).indexOf(his[i].reactions[j].users[l]);
           
-          //bot自身のreactionはindexOfが-1なので除外
+          //bot自身のreactionはindexOfが-1(リストから発見されない)なので除外
           if(indexNum>=0){
             money[indexNum] = money[indexNum] - price[1];
             postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+price[1]+"]");
@@ -48,10 +45,12 @@ function main() {
         var newMessage = app.channelsHistory(channel,{"count":1}).messages;
         addEmoji(token,channel,newMessage[0].ts);
       }
+    }else{
+      //ユーザーの入荷投稿にもreactionを付与する
+      addEmoji(token,channel,his[i].ts);
     }
   }
 }
-
 
 function postMessage(id,message){
   var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');

@@ -1,7 +1,5 @@
 # Slack Shop with GAS
 
-![Badge Status](https://ci-as-a-service)
-
 Let's use Slack as a shop!
 
 ## Description

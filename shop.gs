@@ -2,20 +2,17 @@ function doPost(e){
   //slackのtoken
   var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   var verify_token = PropertiesService.getScriptProperties().getProperty('SLACK_EVENTS_TOKEN');
+  var channel = PropertiesService.getScriptProperties().getProperty('SLACK_CHANNEL_ID');
   var app = SlackApp.create(token); 
   
   //送信データが肝心の部分がjsonではなくstringのため，jsonデータに直している
   var jsonContent = (new Function("return " + e.postData.contents))();
 
-  
   if (verify_token != jsonContent.token) {
     throw new Error("invalid token.");
   };
   
-  if(jsonContent.event.type == "reaction_added"){
-    //会計処理のログを投稿するチャンネルのID
-    //var channel = PropertiesService.getScriptProperties().getProperty("C7T3EDF0A");
-    var channel = "C7T3EDF0A";
+  if(jsonContent.event.item.channel == channel){
     var message = "";
   
     //spreadsheetの読み込み
@@ -28,8 +25,6 @@ function doPost(e){
   
     var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
 
-  
-    //postMessage(channel,price[1]+" "+jsonContent.event.user);
     //reactionを付けたユーザーのインデックスを調べる
     var indexNum = arrayParse(member).indexOf(jsonContent.event.user);
     if(indexNum>=0){

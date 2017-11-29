@@ -1,55 +1,65 @@
-function main() {
+function doPost(e){
   //slackのtoken
   var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  var verify_token = PropertiesService.getScriptProperties().getProperty('SLACK_EVENTS_TOKEN');
   var app = SlackApp.create(token); 
   
-  //会計処理のログを投稿するチャンネルのID
-  var channel = PropertiesService.getScriptProperties().getProperty('SLACK_CHANNEL_ID');
+  //送信データが肝心の部分がjsonではなくstringのため，jsonデータに直している
+  var jsonContent = (new Function("return " + e.postData.contents))();
 
-  //購買チャンネルのログを取得
-  var his = app.channelsHistory(channel,{"count":100}).messages;
-  var message = "";
   
-  //spreadsheetの読み込み
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var lastrow = sheet.getLastRow();
-　var member = sheet.getSheetValues(1, 1, lastrow, 1);  //データ行のみを取得する
-  var member_name = sheet.getSheetValues(1,3,lastrow,1);
-　var money = sheet.getSheetValues(1, 2, lastrow, 1); //データ行のみを取得する
-  var money_old = money.slice(0, money.length);
+  if (verify_token != jsonContent.token) {
+    throw new Error("invalid token.");
+  };
   
-  for(var i in his){
-    //商品名や価格を投稿のテキスト情報から取得
-    var price = (his[i].text).split(" ");
-    if(his[i].reactions != null){
-      for(var j in his[i].reactions){
-        for(var l in his[i].reactions[j].users){
-          //reactionを付けたユーザーのインデックスを調べる
-          var indexNum = arrayParse(member).indexOf(his[i].reactions[j].users[l]);
+  if(jsonContent.event.type == "reaction_added"){
+    //会計処理のログを投稿するチャンネルのID
+    //var channel = PropertiesService.getScriptProperties().getProperty("C7T3EDF0A");
+    var channel = "C7T3EDF0A";
+    var message = "";
+  
+    //spreadsheetの読み込み
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastrow = sheet.getLastRow();
+　    var member = sheet.getSheetValues(1, 1, lastrow, 1);  //データ行のみを取得する
+    var member_name = sheet.getSheetValues(1,3,lastrow,1);
+　    var money = sheet.getSheetValues(1, 2, lastrow, 1); //データ行のみを取得する
+    var money_old = money.slice(0, money.length);
+  
+    var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
+
+  
+    //postMessage(channel,price[1]+" "+jsonContent.event.user);
+    //reactionを付けたユーザーのインデックスを調べる
+    var indexNum = arrayParse(member).indexOf(jsonContent.event.user);
+    if(indexNum>=0){
+      money[indexNum] = money[indexNum] - text[1];
+      postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+text[1]+"]");
+      postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+text[1]+"]");
           
-          //bot自身のreactionはindexOfが-1(リストから発見されない)なので除外
-          if(indexNum>=0){
-            money[indexNum] = money[indexNum] - price[1];
-            postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+price[1]+"]");
-            postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+price[1]+"]");
-          
-            sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
-          }
-        }
-      }
-      //必ずbotが1つreactionを付けているので、それを無視するようにして購入があった投稿を再投稿
-      if((his[i].reactions.length!=1)||(his[i].reactions[j].users.length!=1)){        
-        var messageCache = his[i].text;
-        app.chatDelete(channel, his[i].ts); 
-        postMessage(channel, messageCache);
-        var newMessage = app.channelsHistory(channel,{"count":1}).messages;
-        addEmoji(token,channel,newMessage[0].ts);
-      }
-    }else{
-      //ユーザーの入荷投稿にもreactionを付与する
-      addEmoji(token,channel,his[i].ts);
+      sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
+    
+      postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
+      app.chatDelete(channel, jsonContent.event.item.ts); 
+      var newMessage = app.channelsHistory(channel,{"count":1}).messages;
+      addEmoji(token,channel,newMessage[0].ts);
     }
   }
+}
+
+function tsToText(channel, ts){
+  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  var app = SlackApp.create(token); 
+  var his = app.channelsHistory(channel,{"count":100}).messages;
+  
+  var text = "";
+  for(var i in his){
+    if(his[i].ts == ts){
+      text = his[i].text;
+    }
+  }
+  
+  return text;
 }
 
 function postMessage(id,message){

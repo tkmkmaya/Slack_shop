@@ -42,6 +42,7 @@ function doPost(e){
   }
 }
 
+//get slack message from timestamp information
 function tsToText(channel, ts){
   var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   var app = SlackApp.create(token); 

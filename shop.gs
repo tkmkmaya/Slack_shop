@@ -28,7 +28,7 @@ function doPost(e){
     //reactionを付けたユーザーのインデックスを調べる
     var indexNum = arrayParse(member).indexOf(jsonContent.event.user);
     if(indexNum>=0){
-      money[indexNum] = money[indexNum] - text[1];
+      money[indexNum] = money[indexNum] - parseInt(text[1]);
       postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+text[1]+"]");
       postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+text[1]+"]");
           

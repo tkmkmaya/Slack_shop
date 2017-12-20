@@ -14,32 +14,20 @@ function doPost(e){
   
   if(jsonContent.event.item.channel == channel){
     var message = "";
-  
-    //spreadsheetの読み込み
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var lastrow = sheet.getLastRow();
-　    var member = sheet.getSheetValues(1, 1, lastrow, 1);  //データ行のみを取得する
-    var member_name = sheet.getSheetValues(1,3,lastrow,1);
-　    var money = sheet.getSheetValues(1, 2, lastrow, 1); //データ行のみを取得する
-    var money_old = money.slice(0, money.length);
-  
     var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
-
-    //reactionを付けたユーザーのインデックスを調べる
-    var indexNum = arrayParse(member).indexOf(jsonContent.event.user);
-    if(indexNum>=0){
-      money[indexNum] = money[indexNum] - parseInt(text[1]);
-      postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+text[1]+"]");
-      postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+text[1]+"]");
-          
-      //sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
-      isdlPay.subMoney(member[indexNum][0], parseInt(text[1]));
-      
-      postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
-      app.chatDelete(channel, jsonContent.event.item.ts); 
-      var newMessage = app.channelsHistory(channel,{"count":1}).messages;
-      addEmoji(token,channel,newMessage[0].ts);
-    }
+    
+    var userId = jsonContent.event.user;
+    isdlPay.subMoney(member[indexNum][0], parseInt(text[1]));
+    
+    var money = isdlPay.getMoney(userId);
+    
+    postMessage("@"+userId,"残高:"+money+"[-"+text[1]+"]");
+    postMessage("#money_log","[出金]"+isdlPay.getNameById(userId)+"[-"+text[1]+"]");
+               
+    postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
+    app.chatDelete(channel, jsonContent.event.item.ts); 
+    var newMessage = app.channelsHistory(channel,{"count":1}).messages;
+    addEmoji(token,channel,newMessage[0].ts);
   }
 }
 

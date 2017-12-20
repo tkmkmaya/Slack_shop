@@ -32,8 +32,9 @@ function doPost(e){
       postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+text[1]+"]");
       postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+text[1]+"]");
           
-      sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
-    
+      //sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
+      isdlPay.subMoney(member[indexNum][0], parseInt(text[1]));
+      
       postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
       app.chatDelete(channel, jsonContent.event.item.ts); 
       var newMessage = app.channelsHistory(channel,{"count":1}).messages;

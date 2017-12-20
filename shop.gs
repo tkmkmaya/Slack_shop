@@ -17,17 +17,19 @@ function doPost(e){
     var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
     
     var userId = jsonContent.event.user;
-    isdlPay.subMoney(member[indexNum][0], parseInt(text[1]));
+    var userName = isdlPay.getNameById(userId);
+    if(parseInt(text[1]) > 0){
+      isdlPay.subMoney(userId, parseInt(text[1]));
+      var money = isdlPay.getMoney(userId);
     
-    var money = isdlPay.getMoney(userId);
-    
-    postMessage("@"+userId,"残高:"+money+"[-"+text[1]+"]");
-    postMessage("#money_log","[出金]"+isdlPay.getNameById(userId)+"[-"+text[1]+"]");
-               
-    postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
-    app.chatDelete(channel, jsonContent.event.item.ts); 
-    var newMessage = app.channelsHistory(channel,{"count":1}).messages;
-    addEmoji(token,channel,newMessage[0].ts);
+      postMessage("@"+userId,"残高:"+money+"[-"+text[1]+"]");
+      postMessage("#money_log","[出金]"+userName+"残高:"+money+"[-"+text[1]+"]");
+                 
+      postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
+      app.chatDelete(channel, jsonContent.event.item.ts); 
+      var newMessage = app.channelsHistory(channel,{"count":1}).messages;
+      addEmoji(token,channel,newMessage[0].ts);
+    }
   }
 }
 

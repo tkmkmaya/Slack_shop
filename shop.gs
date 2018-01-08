@@ -21,9 +21,7 @@ function doPost(e){
     if(parseInt(text[1]) > 0){
       isdlPay.subMoney(userId, parseInt(text[1]));
       var money = isdlPay.getMoney(userId);
-    
-      postMessage("@"+userId,"残高:"+money+"[-"+text[1]+"]");
-      postMessage("#money_log","[出金]"+userName+"残高:"+money+"[-"+text[1]+"]");
+      setLogSheet(userName,parseInt(text[1]));
                  
       postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
       app.chatDelete(channel, jsonContent.event.item.ts); 
@@ -89,4 +87,18 @@ function arrayParse(array){
   }
   
   return parseArray;
+}
+
+function setLogSheet(userName, value){
+  //spreadsheetの読み込み
+  var sheet = SpreadsheetApp.openById('1nVfofGTHTQR76cSLaYIA0p0BFjUyLgXFU22axxcBfv0');
+  var lastrow = sheet.getLastRow()
+  
+  var date = "A"+(lastrow+1);
+  var today = new Date();
+  sheet.getRange(date).setValue(today);
+  var user = "B"+(lastrow+1);
+  sheet.getRange(user).setValue(userName);
+  var valueAdd = "D"+(lastrow+1);
+  sheet.getRange(valueAdd).setValue(value);
 }

@@ -1,34 +1,41 @@
-function doPost(e){
-  //slackのtoken
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var verify_token = PropertiesService.getScriptProperties().getProperty('SLACK_EVENTS_TOKEN');
-  var channel = PropertiesService.getScriptProperties().getProperty('SLACK_CHANNEL_ID');
-  var app = SlackApp.create(token); 
+function doPost(e) {
+  // exploit JSON from payload
+  //var data = contents.substr(8); //[payload={JSON}]
+  var parameter = e.parameter;
+  var data = parameter.payload;
+  var json = JSON.parse(decodeURIComponent(data));
+  var original_text = json.original_message.text;
   
-  //送信データが肝心の部分がjsonではなくstringのため，jsonデータに直している
-  var jsonContent = (new Function("return " + e.postData.contents))();
-
-  if (verify_token != jsonContent.token) {
-    throw new Error("invalid token.");
-  };
+  var text = original_text.split(" ");
+  var userId = json.user.id;
+  var userName = isdlPay.getNameById(userId);
   
-  if(jsonContent.event.item.channel == channel){
-    var message = "";
-    var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
-    
-    var userId = jsonContent.event.user;
-    var userName = isdlPay.getNameById(userId);
-    if(parseInt(text[1]) > 0){
+  if (parseInt(text[1]) > 0) {
       isdlPay.subMoney(userId, parseInt(text[1]));
       var money = isdlPay.getMoney(userId);
-      setLogSheet(userName,parseInt(text[1]));
-                 
-      postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
-      app.chatDelete(channel, jsonContent.event.item.ts); 
-      var newMessage = app.channelsHistory(channel,{"count":1}).messages;
-      addEmoji(token,channel,newMessage[0].ts);
-    }
+      setLogSheet(userName, parseInt(text[1]));
   }
+  
+  var replyMessage = {
+    "replace_original": true,
+    "response_type": "in_channel",
+    "text": original_text,
+    "attachments": [{
+      "fallback": "Sorry, no support for buttons.",
+      "callback_id": "ButtonResponse",
+      "color": "#3AA3E3",
+      "attachment_type": "default",
+      "actions": [{
+        "name": "購入",
+        "text": "購入",
+        "type": "button",
+        "value": "chess"
+      }]
+    }]
+  };
+  //var originalMessage = (new Function("return " + e.parameter.))();
+  return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
+  //return ContentService.createTextOutput(JSON.parse(e)).setMimeType(ContentService.MimeType.JSON);
 }
 
 //get slack message from timestamp information

@@ -4,96 +4,52 @@ function doPost(e) {
   var parameter = e.parameter;
   var data = parameter.payload;
   var json = JSON.parse(decodeURIComponent(data));
-  var original_text = json.original_message.text;
+  var num = (json.original_message.attachments[0].text).split(": ");
+  var title = json.original_message.attachments[0].title;
+  var price = parseInt(json.actions[0].value);
+  var image_url = json.original_message.attachments[0].image_url;
   
-  var text = original_text.split(" ");
   var userId = json.user.id;
   var userName = isdlPay.getNameById(userId);
   
-  if (parseInt(text[1]) > 0) {
-      isdlPay.subMoney(userId, parseInt(text[1]));
-      var money = isdlPay.getMoney(userId);
-      setLogSheet(userName, parseInt(text[1]));
+  if (parseInt(price) > 0) {
+    if(json.actions[0].name == "buy"){
+      isdlPay.subMoney(userId, price);
+      setLogSheet(userName, price);
+      num[1] = parseInt(num[1])-1;
+    }else if(json.actions[0].name == "cancel"){
+      isdlPay.addMoney(userId, price);
+      num[1] = parseInt(num[1])+1;
+    }
   }
-  
+                       
   var replyMessage = {
     "replace_original": true,
     "response_type": "in_channel",
-    "text": original_text,
     "attachments": [{
+      "title": title,
+      "text": "在庫: "+num[1],
       "fallback": "Sorry, no support for buttons.",
       "callback_id": "ButtonResponse",
       "color": "#3AA3E3",
       "attachment_type": "default",
       "actions": [{
-        "name": "購入",
-        "text": "購入",
+        "name": "buy",
+        "text": price+"円",
         "type": "button",
-        "value": "chess"
-      }]
+        "value": price
+      },{
+        "name": "cancel",
+        "text": "キャンセル",
+        "type": "button",
+        "value": price
+      }],
+      "image_url":image_url
     }]
   };
   //var originalMessage = (new Function("return " + e.parameter.))();
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
   //return ContentService.createTextOutput(JSON.parse(e)).setMimeType(ContentService.MimeType.JSON);
-}
-
-//get slack message from timestamp information
-function tsToText(channel, ts){
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var app = SlackApp.create(token); 
-  var his = app.channelsHistory(channel,{"count":100}).messages;
-  
-  var text = "";
-  for(var i in his){
-    if(his[i].ts == ts){
-      text = his[i].text;
-    }
-  }
-  
-  return text;
-}
-
-function postMessage(id,message){
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var bot_name = "ウィーゴ";
-  var bot_icon = "http://www.hasegawa-model.co.jp/hsite/wp-content/uploads/2016/04/cw12p5.jpg";
-  var app = SlackApp.create(token);   
-  
-  return app.postMessage(id, message, {
-    username: bot_name,
-    icon_url: bot_icon,
-    link_names: 1
-  });
-}
-
-function addEmoji(token, channel, timestamp){
-  var method = "post";
-  var url = "https://slack.com/api/reactions.add"
-  
-  //slackAppが対応していない制御用
-  var payload = {
-    'token'      : token,
-    'channel'    : channel,
-    'timestamp'  : timestamp,
-    'name'       : "buy"
-  };
- 
-  var params = {
-    'method' : method,
-    'payload' : payload
-  };
-  
-  return UrlFetchApp.fetch(url, params);
-}
-
-function arrayParse(array){
-  var parseArray = [];
-  for(var i=0; i<array.length; i++){
-    parseArray[i] = array[i][0]; 
-  }
-  
-  return parseArray;
 }
 
 function setLogSheet(userName, value){

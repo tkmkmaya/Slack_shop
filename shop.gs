@@ -1,6 +1,9 @@
+//Library
+//slackApp M3W5Ut3Q39AaIwLquryEPMwV62A3znfOO
+//isdlPay  MyBnOwlA5O5e2Uvdl82H6R-aMJ5Q-zlzu
+
 function doPost(e) {
-  // exploit JSON from payload
-  //var data = contents.substr(8); //[payload={JSON}]
+  //exploit JSON from payload
   var parameter = e.parameter;
   var data = parameter.payload;
   var json = JSON.parse(decodeURIComponent(data));
@@ -15,7 +18,7 @@ function doPost(e) {
   if (parseInt(price) > 0) {
     if(json.actions[0].name == "buy"){
       isdlPay.subMoney(userId, price);
-      setLogSheet(userName, price);
+      //setLogSheet(userName, price);
       num[1] = parseInt(num[1])-1;
     }else if(json.actions[0].name == "cancel"){
       isdlPay.addMoney(userId, price);
@@ -51,6 +54,7 @@ function doPost(e) {
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
 }
 
+/*
 function setLogSheet(userName, value){
   //spreadsheetの読み込み
   var SS = SpreadsheetApp.openById('1nVfofGTHTQR76cSLaYIA0p0BFjUyLgXFU22axxcBfv0');
@@ -61,3 +65,4 @@ function setLogSheet(userName, value){
   var data = [[today,userName,"",value]];
   sheet.getRange(lastrow+1,1,1,4).setValues(data);
 }
+*/

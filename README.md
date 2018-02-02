@@ -2,18 +2,18 @@
 Slackで購買を運営しよう！
 
 ## Description
-Slack Shopとは，GASによって特定のグループ上で電子マネーシステムを構築し，slackのチャンネルにて商品の購入を可能とするシステムの総称です。
+Slack Shopとは，GASによって特定のグループ上で電子マネーシステムを構築し，slackのチャンネルにて商品の購入を可能とするシステムの総称です。  
 本システムは以下の3つのGASスクリプトから構成されており，Slackインテグレーションを用いて連携が取られています。
 
--Slack_shop_add_command(https://github.com/zensai3805/Slack_shop_add_command)
-Slackの購買チャンネルに商品を追加するslash commandのスクリプトです。
-対象チャンネルには，ボタン付きの商品メッセージが追加されます。
+-Slack_shop_add_command(https://github.com/zensai3805/Slack_shop_add_command)  
+Slackの購買チャンネルに商品を追加するslash commandのスクリプトです。  
+対象チャンネルには，ボタン付きの商品メッセージが追加されます。  
 
--Slask_shop_receiver(本スクリプト)
-Slackで商品メッセージに付いている購入ボタンを押すと，本スクリプトが起動し，購入者の残高を減らし，slackへ通知を行います。
+-Slask_shop_receiver(本スクリプト)  
+Slackで商品メッセージに付いている購入ボタンを押すと，本スクリプトが起動し，購入者の残高を減らし，slackへ通知を行います。  
 
--Slask_shop_receiver(https://github.com/zensai3805/slack_shop_api)
-SpreadSheetに記述されたユーザーの残高情報やslackのID情報等を元に，取引処理や名前解決を行うAPIです。
+-Slask_shop_receiver(https://github.com/zensai3805/slack_shop_api)  
+SpreadSheetに記述されたユーザーの残高情報やslackのID情報等を元に，取引処理や名前解決を行うAPIです。  
 
 ***DEMO:***
 

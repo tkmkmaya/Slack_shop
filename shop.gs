@@ -1,101 +1,68 @@
-function doPost(e){
-  //slackのtoken
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var verify_token = PropertiesService.getScriptProperties().getProperty('SLACK_EVENTS_TOKEN');
-  var channel = PropertiesService.getScriptProperties().getProperty('SLACK_CHANNEL_ID');
-  var app = SlackApp.create(token); 
-  
-  //送信データが肝心の部分がjsonではなくstringのため，jsonデータに直している
-  var jsonContent = (new Function("return " + e.postData.contents))();
+//Library
+//slackApp M3W5Ut3Q39AaIwLquryEPMwV62A3znfOO
+//isdlPay  MyBnOwlA5O5e2Uvdl82H6R-aMJ5Q-zlzu
 
-  if (verify_token != jsonContent.token) {
-    throw new Error("invalid token.");
-  };
-  
-  if(jsonContent.event.item.channel == channel){
-    var message = "";
-  
-    //spreadsheetの読み込み
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var lastrow = sheet.getLastRow();
-　    var member = sheet.getSheetValues(1, 1, lastrow, 1);  //データ行のみを取得する
-    var member_name = sheet.getSheetValues(1,3,lastrow,1);
-　    var money = sheet.getSheetValues(1, 2, lastrow, 1); //データ行のみを取得する
-    var money_old = money.slice(0, money.length);
-  
-    var text = tsToText(channel, jsonContent.event.item.ts).split(" ");
-
-    //reactionを付けたユーザーのインデックスを調べる
-    var indexNum = arrayParse(member).indexOf(jsonContent.event.user);
-    if(indexNum>=0){
-      money[indexNum] = money[indexNum] - parseInt(text[1]);
-      postMessage("@"+member[indexNum],"残高:"+money[indexNum]+"[-"+text[1]+"]");
-      postMessage("#money_log","[購入]"+member_name[indexNum]+"[-"+text[1]+"]");
-          
-      sheet.getRange(indexNum+1,2).setValue(money[indexNum]);
+function doPost(e) {
+  //exploit JSON from payload
+  var parameter = e.parameter;
+  var data = parameter.payload;
+  var json = JSON.parse(decodeURIComponent(data));
+  var num = (json.original_message.attachments[0].text).split(": ");
+  var title = json.original_message.attachments[0].title;
+  var price = parseInt(json.actions[0].value);
+  var image_url = json.original_message.attachments[0].image_url;
     
-      postMessage(channel, tsToText(channel, jsonContent.event.item.ts));
-      app.chatDelete(channel, jsonContent.event.item.ts); 
-      var newMessage = app.channelsHistory(channel,{"count":1}).messages;
-      addEmoji(token,channel,newMessage[0].ts);
+  var userId = json.user.id;
+  var userName = isdlPay.getNameById(userId);
+  
+  if (parseInt(price) > 0) {
+    if(json.actions[0].name == "buy"){
+      isdlPay.subMoney(userId, price);
+      //setLogSheet(userName, price);
+      num[1] = parseInt(num[1])-1;
+    }else if(json.actions[0].name == "cancel"){
+      isdlPay.addMoney(userId, price);
+      num[1] = parseInt(num[1])+1;
     }
   }
-}
-
-//get slack message from timestamp information
-function tsToText(channel, ts){
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var app = SlackApp.create(token); 
-  var his = app.channelsHistory(channel,{"count":100}).messages;
-  
-  var text = "";
-  for(var i in his){
-    if(his[i].ts == ts){
-      text = his[i].text;
-    }
-  }
-  
-  return text;
-}
-
-function postMessage(id,message){
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var bot_name = "ウィーゴ";
-  var bot_icon = "http://www.hasegawa-model.co.jp/hsite/wp-content/uploads/2016/04/cw12p5.jpg";
-  var app = SlackApp.create(token);   
-  
-  return app.postMessage(id, message, {
-    username: bot_name,
-    icon_url: bot_icon,
-    link_names: 1
-  });
-}
-
-function addEmoji(token, channel, timestamp){
-  var method = "post";
-  var url = "https://slack.com/api/reactions.add"
-  
-  //slackAppが対応していない制御用
-  var payload = {
-    'token'      : token,
-    'channel'    : channel,
-    'timestamp'  : timestamp,
-    'name'       : "buy"
+                    
+  var replyMessage = {
+    "replace_original": true,
+    "response_type": "in_channel",
+    "attachments": [{
+      "title": title,
+      "text": "在庫: "+num[1],
+      "fallback": "Sorry, no support for buttons.",
+      "callback_id": "ButtonResponse",
+      "color": "#3AA3E3",
+      "attachment_type": "default",
+      "actions": [{
+        "name": "buy",
+        "text": price+"円",
+        "type": "button",
+        "value": price
+      },{
+        "name": "cancel",
+        "text": "キャンセル",
+        "type": "button",
+        "value": price
+      }],
+      "image_url":image_url
+    }]
   };
- 
-  var params = {
-    'method' : method,
-    'payload' : payload
-  };
-  
-  return UrlFetchApp.fetch(url, params);
+
+  return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function arrayParse(array){
-  var parseArray = [];
-  for(var i=0; i<array.length; i++){
-    parseArray[i] = array[i][0]; 
-  }
+/*
+function setLogSheet(userName, value){
+  //spreadsheetの読み込み
+  var SS = SpreadsheetApp.openById('1nVfofGTHTQR76cSLaYIA0p0BFjUyLgXFU22axxcBfv0');
+  var sheet=SS.getSheetByName("当月");
+  var lastrow=sheet.getDataRange().getLastRow();
   
-  return parseArray;
+  var today = new Date();
+  var data = [[today,userName,"",value]];
+  sheet.getRange(lastrow+1,1,1,4).setValues(data);
 }
+*/

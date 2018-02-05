@@ -18,7 +18,6 @@ function doPost(e) {
   if (parseInt(price) > 0) {
     if(json.actions[0].name == "buy"){
       isdlPay.subMoney(userId, price);
-      //setLogSheet(userName, price);
       num[1] = parseInt(num[1])-1;
     }else if(json.actions[0].name == "cancel"){
       isdlPay.addMoney(userId, price);
@@ -53,16 +52,3 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
 }
-
-/*
-function setLogSheet(userName, value){
-  //spreadsheetの読み込み
-  var SS = SpreadsheetApp.openById('1nVfofGTHTQR76cSLaYIA0p0BFjUyLgXFU22axxcBfv0');
-  var sheet=SS.getSheetByName("当月");
-  var lastrow=sheet.getDataRange().getLastRow();
-  
-  var today = new Date();
-  var data = [[today,userName,"",value]];
-  sheet.getRange(lastrow+1,1,1,4).setValues(data);
-}
-*/

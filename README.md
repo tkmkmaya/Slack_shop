@@ -3,17 +3,19 @@ Slackで購買を運営しよう！
 
 ## Description
 Slack Shopとは，GASによって特定のグループ上で電子マネーシステムを構築し，slackのチャンネルにて商品の購入を可能とするシステムの総称です。  
-本システムは以下の3つのGASスクリプトから構成されており，Slackインテグレーションを用いて連携が取られています。
-
-- Slack_shop_add_command(https://github.com/zensai3805/Slack_shop_add_command)  
-  - Slackの購買チャンネルに商品を追加するslash commandのスクリプトです。  
-対象チャンネルには，ボタン付きの商品メッセージが追加されます。  
+本システムは以下の4つのGASスクリプトから構成されており，Slackインテグレーションを用いて連携が取られています。
 
 - Slask_shop_receiver(本スクリプト)  
-  - Slackで商品メッセージに付いている購入ボタンを押すと，本スクリプトが起動し，購入者の残高を減らし，slackへ通知を行います。  
+  - Slackの購買チャンネルで購入ボタンを押すことで呼び出され、入出金ライブラリを呼び出し処理を行います。
 
-- Slask_shop_api(https://github.com/zensai3805/slack_shop_api)  
-SpreadSheetに記述されたユーザーの残高情報やslackのID情報等を元に，取引処理や名前解決を行うAPIです。  
+- Slack_shop_add_command[[gihHub link]](https://github.com/zensai3805/Slack_shop_add_command)  
+  - Slackの購買チャンネルに商品を追加するslash commandのスクリプトです。購買チャンネルには，ボタン付きの商品メッセージが追加されます。  
+  
+- Slack_shop_input_webui[[gitHub link]](https://github.com/zensai3805/Slack_shop_Input_webui)
+  - 入金を行うためのWebUIです。GASにて公開したURLをブラウザにて開くことで、入金のためのUIが表示されます。研究室での利用のため、入金は信用ということで、iPadをお金を入れる箱の横において本WebUIを利用させています。
+
+- Slask_shop_api[[gitHub link]](https://github.com/zensai3805/slack_shop_api)  
+  - SpreadSheetに記述されたユーザーの残高情報やslackのID情報等を元に，取引処理や名前解決を行うAPIです。  
 
 ***DEMO:***
 

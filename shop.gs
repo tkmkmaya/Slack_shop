@@ -2,7 +2,7 @@
 //isdlPay  MF69OVvcBvkymVokVsE1aHeaMJ5Q-zlzu
 
 //Project properties
-//SLACK_ACCESS_TOKEN: Slack API access-token
+//SLACK_ACCESS_TOKEN: Slack API Oath Access token
 //sheet_id          : Google SpreadSheet ID for 残高リスト
 
 function doPost(e) {

@@ -12,7 +12,11 @@ function doPost(e) {
   var json = JSON.parse(decodeURIComponent(data));
   //var num = (json.original_message.attachments[0].text).split(": ");
   var name = json.original_message.attachments[0].title;
-  var price = parseInt(json.actions[0].value);
+
+  var product = (json.actions[0].value).split(",");
+  var product_price = product[0];
+  var product_add_user = product[1];
+
   var image_url = json.original_message.attachments[0].image_url;
   
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
@@ -22,7 +26,10 @@ function doPost(e) {
   var userName = isdlPay.getNameById(userId, sheet_id);
   
   if(json.actions[0].name == "buy"){
-    isdlPay.subMoney(userId, price, slack_access_token, sheet_id);
+    isdlPay.subMoney(userId, product_price, slack_access_token, sheet_id);
+    if(product_add_user != "master"){
+      isdlPay.addMoney(product_add_user, product_price, slack_access_token, sheet_id);
+    }
     //num[1] = parseInt(num[1])-1;
   }else if(json.actions[0].name == "cancel"){
     isdlPay.addMoney(userId, price, slack_access_token, sheet_id);
@@ -41,9 +48,9 @@ function doPost(e) {
       "attachment_type": "default",
       "actions": [{
         "name": "buy",
-        "text": price+"円",
+        "text": product_price+"円",
         "type": "button",
-        "value": price
+        "value": product_price+","+product_add_user
       }/**キャンセルボタンを削除
       ,{
         "name": "cancel",

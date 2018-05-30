@@ -46,7 +46,7 @@ function doPost(e) {
     "response_type": "in_channel",
     "attachments": [{
       "title": name,
-      "text": "by"+isdlPay.getNameById(product_add_user, sheet_id),
+      "text": "by "+isdlPay.getNameById(product_add_user, sheet_id),
       "fallback": "Sorry, no support for buttons.",
       "callback_id": "ButtonResponse",
       "color": "#3AA3E3",

@@ -14,7 +14,7 @@ function doPost(e) {
   var name = json.original_message.attachments[0].title;
 
   var product = (json.actions[0].value).split(",");
-  var product_price = product[0];
+  var product_price = parseInt(product[0]);
   var product_add_user = product[1];
 
   var image_url = json.original_message.attachments[0].image_url;

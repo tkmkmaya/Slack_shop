@@ -27,8 +27,10 @@ function doPost(e) {
   
   if(json.actions[0].name == "buy"){
     isdlPay.subMoney(userId, product_price, slack_access_token, sheet_id);
-    if(product_add_user != "master"){
-      isdlPay.addMoney(product_add_user, product_price, slack_access_token, sheet_id);
+    if(product_add_user != ""){ //コードが汚いが、これは環境移行時のみ利用。そのうち消します。
+      if(product_add_user != "master"){
+        isdlPay.addMoney(product_add_user, product_price, slack_access_token, sheet_id);
+      }
     }
     //num[1] = parseInt(num[1])-1;
   }else if(json.actions[0].name == "cancel"){

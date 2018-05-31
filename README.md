@@ -24,7 +24,11 @@ Slack Shopとは，GASによって特定のグループ上で電子マネーシ�
 ## Requirement
 
 - Google AppScript
-- SlackApp(GAS Library: https://qiita.com/soundTricker/items/43267609a870fc9c7453)
+
+### Required GAS Library
+- SlackApp
+  - Qiita記事: [https://qiita.com/soundTricker/items/43267609a870fc9c7453](https://qiita.com/soundTricker/items/43267609a870fc9c7453)
+  - Library ID: M3W5Ut3Q39AaIwLquryEPMwV62A3znfOO
 
 ## Author
 

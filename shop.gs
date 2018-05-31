@@ -18,7 +18,7 @@ function doPost(e) {
   var product_add_user = product[1];
   
   //移行中専用の臨時コード
-  if(product_add_user == null){
+  if(product_add_user == ""){
     product_add_user == "master";
   }
 
@@ -59,9 +59,10 @@ function doPost(e) {
       }/**キャンセルボタンを削除
       ,{
         "name": "cancel",
-        "text": "キャンセル",
+        "text": "注文をキャンセル",
         "type": "button",
         "value": price
+        
       }**/
       ],
       "image_url":image_url
@@ -69,13 +70,4 @@ function doPost(e) {
   };
 
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
-}
-
-//デバッグ関数を作りたい
-function doPostTest(){
-  var e = {
-    parameter: {
-      payload: "test"
-    }
-  }
 }

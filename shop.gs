@@ -59,9 +59,10 @@ function doPost(e) {
       }/**キャンセルボタンを削除
       ,{
         "name": "cancel",
-        "text": "キャンセル",
+        "text": "注文をキャンセル",
         "type": "button",
         "value": price
+        
       }**/
       ],
       "image_url":image_url

@@ -17,19 +17,24 @@ function doPost(e) {
   var product_add_user = product[1];
   
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  
   var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
+  if(sheet_id == null){
+    sheet_id = create_spreadSheets();
+  }
     
-  var userId = json.user.id;
+  var customerId = json.user.id;
   if(json.actions[0].name == "buy"){
-    isdlPay.subMoney(userId, product_price, slack_access_token, sheet_id);
-      if(product_add_user != "master"){
-        isdlPay.addMoney(product_add_user, product_price, slack_access_token, sheet_id);
-      }
+    isdlPay.transMoney(product_add_user, customerId, product_price, slack_access_token, sheet_id)
+
     //num[1] = parseInt(num[1])-1;
-  }else if(json.actions[0].name == "cancel"){
+  }
+  /**
+  else if(json.actions[0].name == "cancel"){
     isdlPay.addMoney(userId, price, slack_access_token, sheet_id);
     //num[1] = parseInt(num[1])+1;
   }
+  **/
                     
   var replyMessage = {
     "replace_original": true,
@@ -60,6 +65,14 @@ function doPost(e) {
   };
 
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
+}
+
+//名簿を記録したスプレッドシードが無い場合、作成してpropertiesにも格納する。
+function create_spreadSheets() {
+  var sheet_id = SpreadsheetApp.create("members").getId();
+ 
+  PropertiesService.getScriptProperties.setProperty("sheet_id",sheet_id);
+  return sheet_id;
 }
 
 

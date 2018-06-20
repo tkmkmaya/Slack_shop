@@ -1,5 +1,5 @@
 //Requirement Library
-//isdlPay  MF69OVvcBvkymVokVsE1aHeaMJ5Q-zlzu
+//slackApp  M3W5Ut3Q39AaIwLquryEPMwV62A3znfOO
 
 //Project properties
 //SLACK_ACCESS_TOKEN: Slack API Oath Access token
@@ -25,7 +25,7 @@ function doPost(e) {
     
   var customerId = json.user.id;
   if(json.actions[0].name == "buy"){
-    isdlPay.transMoney(product_add_user, customerId, product_price, slack_access_token, sheet_id)
+    transMoney(product_add_user, customerId, product_price, slack_access_token, sheet_id)
 
     //num[1] = parseInt(num[1])-1;
   }
@@ -35,7 +35,10 @@ function doPost(e) {
     //num[1] = parseInt(num[1])+1;
   }
   **/
-                    
+  
+  var replyMessage = json.original_message;
+  
+  /**
   var replyMessage = {
     "replace_original": true,
     "response_type": "in_channel",
@@ -51,18 +54,18 @@ function doPost(e) {
         "text": product_price+"円",
         "type": "button",
         "value": product_price+","+product_add_user
-      }/**キャンセルボタンを削除
-      ,{
+      },{
         "name": "cancel",
         "text": "注文をキャンセル",
         "type": "button",
         "value": price
         
-      }**/
+      }
       ],
       "image_url":json.original_message.attachments[0].image_url
     }]
   };
+  **/
 
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
 }

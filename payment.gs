@@ -3,9 +3,9 @@
 
 function transMoney(recvId, sendId, value, slack_access_token, sheet_id) {
   //出品者自身の商品を買った場合の例外処理
-  if(recvId != sendId){
+  if(recvId == sendId){
     postMessage(slack_access_token, "@"+recvId,"出品者自身の購入のため、処理は行いませんでした。["+value+"円]");
-    postMessage(slack_access_token, "#money_log","[送金]"+sendInfo.userName+"->"+recvInfo.userName+"["+value+"円]");
+    postMessage(slack_access_token, "#money_log","出品者自身の購入のため、処理は行いませんでした。["+value+"円]");
     return;
   }
    

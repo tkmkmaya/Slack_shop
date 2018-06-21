@@ -28,12 +28,14 @@ function doPost(e) {
   if(json.actions[0].name == "buy"){
     transMoney(product_add_user, customerId, product_price, slack_access_token, sheet_id);
     replyMessage.attachments[0].fields[0].value -= 1;
-  }
-  else if(json.actions[0].name == "cancel"){
+  }else if(json.actions[0].name == "cancel"){
     transMoney(customerId, product_add_user, product_price, slack_access_token, sheet_id);
     replyMessage.attachments[0].fields[0].value += 1;
+  }else if(json.actions[0].name == "input"){
+    addMoney(customerId, product_price, slack_access_token, sheet_id);
   }
-  
+
+  res_fetch(json.response_url, replyMessage);
   return ContentService.createTextOutput(JSON.stringify(replyMessage)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -45,6 +47,18 @@ function create_spreadSheets() {
   return sheet_id;
 }
 
+//responce_urlに直接返す
+function res_fetch(res_url, message){
+  // format for Slack
+  var options = {
+    'method': 'post',
+    'contentType': 'application/json',
+    // Convert the JavaScript object to a JSON string.
+    'payload': JSON.stringify(message)
+  };
+  // post to Slack
+  UrlFetchApp.fetch(res_url, options);
+}
 
 //デバッグ関数を作りたい
 function doPostTest(){

@@ -41,8 +41,8 @@ function addMoney(userId, value, slack_access_token, sheet_id) {
   //spreadSheetに増額後の値を入力
   sheet.getRange(userInfo.sheetMoneyAddress).setValue(parseInt(userInfo.money) + value);
     
-  postMessage(slack_access_token, "@"+userId,"残高:"+money+"[+"+value+"]");
-  postMessage(slack_access_token, "#money_log","[入金]"+userInfo.userName+"残高:"+money+"[+"+value+"]");
+  postMessage(slack_access_token, "@"+userId,"残高:"+(parseInt(userInfo.money) + value)+"[+"+value+"]");
+  postMessage(slack_access_token, "#money_log","[入金]"+userInfo.userName+"残高:"+(parseInt(userInfo.money) + value)+"[+"+value+"]");
 }
 
 function subMoney(userId, value, slack_access_token, sheet_id) {
@@ -58,11 +58,11 @@ function subMoney(userId, value, slack_access_token, sheet_id) {
   //spreadSheetに増額後の値を入力
   sheet.getRange(userInfo.sheetMoneyAddress).setValue(parseInt(userInfo.money) - value);
     
-  postMessage(slack_access_token, "@"+userId,"残高:"+money+"[-"+value+"]");
+  postMessage(slack_access_token, "@"+userId,"残高:"+(parseInt(userInfo.money) + value)+"[-"+value+"]");
   if(money < 0){
     postMessage(slack_access_token, "@"+userId,"残高がマイナスです。本システムは融資ではありません。");
   }
-  postMessage(slack_access_token, "#money_log","[出金]"+userInfo.userName+"残高:"+money+"[-"+value+"]");
+  postMessage(slack_access_token, "#money_log","[出金]"+userInfo.userName+"残高:"+(parseInt(userInfo.money) + value)+"[-"+value+"]");
 }
 
 function arrayParse(array) {

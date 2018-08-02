@@ -1,6 +1,7 @@
 function sendAddShopDialog(trigger_id) {
   // slack channel url (where to send the message)
   var slackUrl = "https://slack.com/api/dialog.open"
+  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   
   //var imageUrl = getGoogleCustomSearchImage(product_name);
   
@@ -56,7 +57,7 @@ function sendAddShopDialog(trigger_id) {
   var options = {
     method: 'post',
     payload: {
-      "token": "xoxp-126383135776-127089976834-265028095171-2c1967eed043f02dc876ad6de6db9d4c",
+      "token": slack_access_token,
       "trigger_id": trigger_id,
       "dialog": JSON.stringify(messageData)
     },
@@ -128,8 +129,8 @@ function addShop(json) {
 }
 
 function getGoogleCustomSearchImage(keyword) {
-  var API_KEY = "AIzaSyCK6YEC_Qw-XVPZz_Iaq-B5ZRyWHKz19JU"
-  var CSE_ID = "014348548348260020551:galvhjh0mkk"
+  var API_KEY = PropertiesService.getScriptProperties().getProperty('GOOGLE_API_KEY');
+  var CSE_ID = PropertiesService.getScriptProperties().getProperty('GOOGLE_CSE_ID');
   var uri = "https://www.googleapis.com/customsearch/v1?key=" + API_KEY + "&cx=" + CSE_ID + "&q=" + keyword + "&searchType=image" + "&imgsz=small"
   var response = UrlFetchApp.fetch(uri);
   var json = JSON.parse(response);

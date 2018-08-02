@@ -3,8 +3,6 @@ function sendAddShopDialog(trigger_id) {
   var slackUrl = "https://slack.com/api/dialog.open"
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   
-  //var imageUrl = getGoogleCustomSearchImage(product_name);
-  
   // message text  
   var messageData = {
     "callback_id": "trigger_addShop",
@@ -84,7 +82,7 @@ function addShop(json) {
   } else {
     var product_imageurl = json.submission.product_imageurl;
   }
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', "ここまで");
+
   // message text  
   var messageData = {
     "attachments": [{
@@ -125,7 +123,6 @@ function addShop(json) {
   };
   // post to Slack
   var message = UrlFetchApp.fetch(slackUrl, options);
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', message);
 }
 
 function getGoogleCustomSearchImage(keyword) {

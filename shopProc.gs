@@ -50,11 +50,7 @@ function sold_out(originalMessage){
   originalMessage.attachments[0].actions[0].name = "restock";
   originalMessage.attachments[0].actions[0].text = "再入荷希望";
   originalMessage.attachments[0].actions[0].value =0;
-  /**
-  originalMessage.attachments[0].actions[1].name = "restock";
-  originalMessage.attachments[0].actions[1].text = "☆☆☆";
-  originalMessage.attachments[0].actions[1].value =0;
-  **/
+
   originalMessage.attachments[0].image_url = "https://qiita-image-store.s3.amazonaws.com/0/211225/1fc3d0ad-6200-9eb8-d901-b8f169da137c.png";
   delete originalMessage.attachments[0].fields[1];
   delete originalMessage.attachments[0].fields[0];

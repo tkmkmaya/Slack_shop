@@ -5,8 +5,6 @@ function sendTransDialog(trigger_id) {
   //get slack access token from properties.
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', "へいへいへーい");
-  
   // message text  
   var messageData = {
     "callback_id": "trigger_trans",
@@ -54,8 +52,6 @@ function trans(json) {
   var sendId = json.user.id;
   var price = parseInt(json.submission.transPrice);
   var recvId = json.submission.recvId;
-  
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', sendId+" "+price+" "+recvId);
   
   transMoney(recvId, sendId, price, slack_access_token, sheet_id);
 }

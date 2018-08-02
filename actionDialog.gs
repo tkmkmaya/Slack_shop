@@ -1,7 +1,7 @@
 function action(json) {
   var message = json.message;
-  
   var ts = message.ts;
+  
   
   if(json.callback_id=="change_image"){
     message.attachments[0].image_url = getGoogleCustomSearchImage(message.attachments[0].title);
@@ -40,7 +40,7 @@ function action(json) {
     }]
     }
     message = messageData;
-     
+    
   }
   
   //投稿
@@ -49,8 +49,6 @@ function action(json) {
     res_fetch(slackUrl, message);
   }
   chatDelete(ts);
-  
-  return ContentService.createTextOutput(JSON.stringify(res)).setMimeType(ContentService.MimeType.JSON);
 }
 
 function chatDelete(ts) {

@@ -18,11 +18,10 @@ function add_menu() {
   // slack channel url (where to send the message)
   var slackUrl = PropertiesService.getScriptProperties().getProperty('SLACK_INCOMMING_URL');
 
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', "ここまで");
   // message text  
   var messageData = {
     "attachments": [{
-      //"title": "ISDL SHOP MENU",
+      "title": "ISDL SHOP MENU",
       "fallback": "Sorry, no support for buttons.",
       "callback_id": "trigger_menu",
       "color": "#3AA3E3",
@@ -54,5 +53,4 @@ function add_menu() {
   };
   // post to Slack
   var message = UrlFetchApp.fetch(slackUrl, options);
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', message);
 }

@@ -5,8 +5,6 @@ function sendInputDialog(trigger_id) {
   //get slack access token from properties.
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   
-  //MailApp.sendEmail('iwa.pc.sw.mo@gmail.com', 'event', "へいへいへーい");
-  
   // message text  
   var messageData = {
     "callback_id": "trigger_input",

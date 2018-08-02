@@ -70,6 +70,7 @@ function addShop(json) {
   var slackUrl = PropertiesService.getScriptProperties().getProperty('SLACK_INCOMMING_URL');
   var product_name = json.submission.product_name;
   
+  //出品者のチェック
   if(json.submission.seller=="you"){
     var user_name = json.user.name;
   }else if(json.submission.seller=="isdl"){
@@ -77,6 +78,8 @@ function addShop(json) {
   }
   var product_price = json.submission.product_price;
   var product_stock = json.submission.product_stock;
+  
+  //画像URLが入力されていない場合はGoogle画像検索から持ってくる
   if (json.submission.product_imageurl == null) {
     var product_imageurl = getGoogleCustomSearchImage(product_name);
   } else {
@@ -122,7 +125,9 @@ function addShop(json) {
     'payload': JSON.stringify(messageData)
   };
   // post to Slack
-  var message = UrlFetchApp.fetch(slackUrl, options);
+  UrlFetchApp.fetch(slackUrl, options);
+  
+  return;
 }
 
 function getGoogleCustomSearchImage(keyword) {

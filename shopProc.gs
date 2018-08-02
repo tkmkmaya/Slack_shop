@@ -1,14 +1,5 @@
 function shop(json) {
-  //get slack access token from properties.
-  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  
   var originalMessage = json.original_message;
-  
-  //get sheet's ID from properties.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
-  if(sheet_id == null){
-    sheet_id = create_spreadSheets();
-  }
   
   if(json.actions[0].name == "buy"){
     //get seller and cusctomer information.
@@ -18,7 +9,7 @@ function shop(json) {
   　var price = parseInt(originalMessage.attachments[0].actions[0].value);
     
     //trans money from customer to seller
-    transMoney(sellerId, customerId, price, slack_access_token, sheet_id);
+    transMoney(sellerId, customerId, price);
     
     //decrement stock num.
     originalMessage.attachments[0].fields[0].value--;
@@ -42,6 +33,7 @@ function create_spreadSheets() {
   return sheet_id;
 }
 
+/**
 String.prototype.repeat = function(num) {
 	return Array(num + 1).join(this);
 };
@@ -68,3 +60,4 @@ function restock(demandNum, originalMessage){
   }
   return originalMessage;
 }
+**/

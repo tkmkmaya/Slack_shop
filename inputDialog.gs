@@ -32,20 +32,13 @@ function sendInputDialog(trigger_id) {
   
   // post to Slack
   UrlFetchApp.fetch(slackUrl, options);
+  return;
 }
 
-function input(json) {
-  //get slack access token from properties.
-  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  
-  //get sheet's ID from properties.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
-  if(sheet_id == null){
-    sheet_id = create_spreadSheets();
-  }
-  
+function input(json) {    
   var customerId = json.user.id;
   var price = parseInt(json.submission.input_price);
   
-  addMoney(customerId, price, slack_access_token, sheet_id);
+  addMoney(customerId, price);
+  return;
 }

@@ -40,18 +40,9 @@ function sendTransDialog(trigger_id) {
 }
 
 function trans(json) {
-  //get slack access token from properties.
-  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  
-  //get sheet's ID from properties.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
-  if(sheet_id == null){
-    sheet_id = create_spreadSheets();
-  }
-  
   var sendId = json.user.id;
   var price = parseInt(json.submission.transPrice);
   var recvId = json.submission.recvId;
   
-  transMoney(recvId, sendId, price, slack_access_token, sheet_id);
+  transMoney(recvId, sendId, price);
 }

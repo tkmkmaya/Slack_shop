@@ -31,8 +31,7 @@ function sendInputDialog(trigger_id) {
   };
   
   // post to Slack
-  UrlFetchApp.fetch(slackUrl, options);
-  return;
+  return UrlFetchApp.fetch(slackUrl, options);
 }
 
 function input(json) {    

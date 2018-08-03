@@ -36,7 +36,7 @@ function sendTransDialog(trigger_id) {
   };
   
   // post to Slack
-  UrlFetchApp.fetch(slackUrl, options);
+  return UrlFetchApp.fetch(slackUrl, options);
 }
 
 function trans(json) {

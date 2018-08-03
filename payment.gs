@@ -24,15 +24,15 @@ function transMoney(recvId, sendId, value) {
     
   if(recvInfo==null){
     var recvInfo = getInfo(recvId, userIdList, moneyList);
-    recvInfo.money = parseInt(recvInfo.money) + value;
-    cache.put(recvId, JSON.stringify(recvInfo), 60*60*24);
   }
+  recvInfo.money = parseInt(recvInfo.money) + parseInt(value);
+  cache.put(recvId, JSON.stringify(recvInfo), 60*60*24);
   
   if(sendInfo==null){
     var sendInfo = getInfo(sendId, userIdList, moneyList);
-    sendInfo.money = parseInt(sendInfo.money) - value;
-    cache.put(sendId, JSON.stringify(sendInfo), 60*60*24);
   }
+  sendInfo.money = parseInt(sendInfo.money) - parseInt(value);
+  cache.put(sendId, JSON.stringify(sendInfo), 60*60*24);
   
   //spreadSheetに増減後の値を入力
   sheet.getRange(recvInfo.sheetMoneyAddress).setValue(recvInfo.money);
@@ -60,7 +60,7 @@ function addMoney(userId, value) {
     var userIdList = sheet.getSheetValues(1, 1, lastrow, 1);
     var moneyList = sheet.getSheetValues(1, 2, lastrow, 1);
     var userInfo = getInfo(userId, userIdList, moneyList);
-    userInfo.money = parseInt(userInfo.money) + value;
+    userInfo.money = parseInt(userInfo.money) + parseInt(value);
     cache.put(userId, JSON.stringify(userInfo), 60*60*24);
   }
   
@@ -89,7 +89,7 @@ function subMoney(userId, value) {
   }
   
   //spreadSheetに増額後の値を入力
-  sheet.getRange(userInfo.sheetMoneyAddress).setValue(parseInt(userInfo.money) - value);
+  sheet.getRange(userInfo.sheetMoneyAddress).setValue(parseInt(userInfo.money) - parseInt(value));
     
   postMessage("@"+userId,"残高:"+userInfo.money+"[-"+value+"]");
   if(money < 0){

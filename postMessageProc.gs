@@ -1,3 +1,4 @@
+/**
 //cacheにpostMessageのキューを追加する.
 function postMessage(id,message){
   cache = CacheService.getPublicCache();
@@ -19,7 +20,7 @@ function postMessage(id,message){
   data.push(JSON.stringify(newData));
   
   //配列を;で分割するstrに変換.
-  cache.put("messages", data.join(';'), 60*60*24); 
+  cache.put("messages", data.join(';'), 60*2); 
 }
 
 //定期実行でcacheを読みpostMessageを実行する
@@ -29,6 +30,15 @@ function timeDrivenPostMessage(){
   
   //cacheを取得しstrを配列に戻す.
   cache = CacheService.getPublicCache();
+  
+  var data = cache.get("messages")
+  
+  if(data==null){
+    return;
+  }else{
+    data = data.split(';');
+  }
+  
   var data = (cache.get("messages")).split(';');
   
   //cacheの競合が怖いのでなるべく早く消しておく
@@ -39,10 +49,14 @@ function timeDrivenPostMessage(){
     data[i] = JSON.parse(data[i]);
     postMessageExec(data[i].id,data[i].message,slack_access_token);
   }
+  return;
 }
+**/
 
 //SlackのWebAPIを叩く.
-function postMessageExec(id,message,slack_access_token){
+function postMessage(id,message){
+  //get slack access token from properties.
+  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   var slackUrl = "https://slack.com/api/chat.postMessage"
   
   var options = {
@@ -59,5 +73,9 @@ function postMessageExec(id,message,slack_access_token){
   
   // post to Slack
   UrlFetchApp.fetch(slackUrl, options);
+}
+
+function test(){
+  postMessage("U3R2MUQQJ","test")
 }
 

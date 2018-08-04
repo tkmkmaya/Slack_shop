@@ -1,4 +1,56 @@
-function transMoney(recvId, sendId, value) {  
+//cacheにtransMoneyのキューを追加する.
+function transMoney(recvId, sendId, value){
+  cache = CacheService.getPublicCache();
+  var data = cache.get("transMoney");
+  
+  //cacheの中身がnullならば空配列に，nullでないならstrを配列に変換する.
+  if(data==null){
+    data = [];
+  }else{
+    data = data.split(';');
+  }
+  
+  var newData = {
+    "recvId": recvId,
+    "sendId": sendId,
+    "value": value
+  }
+  
+  //オブジェクトであるnewDataをstrに変換して配列に追加.
+  data.push(JSON.stringify(newData));
+  
+  //配列を;で分割するstrに変換.
+  cache.put("transMoney", data.join(';'), 60*2); 
+}
+
+//定期実行でcacheを読みtransMoneyを実行する
+function timeDrivenTransMoney(){
+  //get slack access token from properties.
+  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  
+  //cacheを取得しstrを配列に戻す.
+  cache = CacheService.getPublicCache();
+  
+  var data = cache.get("transMoney")
+  
+  if(data==null){
+    return;
+  }else{
+    data = data.split(';');
+  }
+  
+  //cacheの競合が怖いのでなるべく早く消しておく
+  cache.remove("transMoney");
+  
+  //配列の中身をstrからjsonに戻し，postMessageExecに投げる.
+  for(var i=0; i<data.length; i++){
+    data[i] = JSON.parse(data[i]);
+    transMoneyExec(data[i].recvId,data[i].sendId, data[i].value);
+  }
+  return;
+}
+
+function transMoneyExec(recvId, sendId, value) {  
   //出品者自身の商品を買った場合の例外処理
   if(recvId == sendId){
     postMessage("@"+recvId,"出品者自身の購入のため、処理は行いませんでした。["+value+"円]");

@@ -64,26 +64,82 @@ function sendAddShopDialog(trigger_id) {
   return UrlFetchApp.fetch(slackUrl, options);
 }
 
-//Dialogに返す
-function addShop(json) {
-  // slack channel url (where to send the message)
-  var slackUrl = PropertiesService.getScriptProperties().getProperty('SLACK_INCOMMING_URL');
-  var product_name = json.submission.product_name;
-  
+//cacheにtransMoneyのキューを追加する.
+function addShop(json){
   //出品者のチェック
   if(json.submission.seller=="you"){
     var user_name = json.user.name;
   }else if(json.submission.seller=="isdl"){
     var user_name = "isdl"; 
   }
+  var product_name = json.submission.product_name;
   var product_price = json.submission.product_price;
   var product_stock = json.submission.product_stock;
   
   //画像URLが入力されていない場合はGoogle画像検索から持ってくる
   if (json.submission.product_imageurl == null) {
-    var product_imageurl = getGoogleCustomSearchImage(product_name);
+    var product_imageurl = "Google"
   } else {
     var product_imageurl = json.submission.product_imageurl;
+  }
+  
+  cache = CacheService.getPublicCache();
+  var data = cache.get("addShop");
+  
+  //cacheの中身がnullならば空配列に，nullでないならstrを配列に変換する.
+  if(data==null){
+    data = [];
+  }else{
+    data = data.split(';');
+  }
+  
+  var newData = {
+    "user_name": user_name,
+    "product_name": product_name,
+    "product_price": product_price,
+    "product_stock": product_stock,
+    "product_imageurl": product_imageurl
+  }
+  
+  //オブジェクトであるnewDataをstrに変換して配列に追加.
+  data.push(JSON.stringify(newData));
+  
+  //配列を;で分割するstrに変換.
+  cache.put("addShop", data.join(';'), 60*2); 
+}
+
+//定期実行でcacheを読みtransMoneyを実行する
+function timeDrivenAddShop(){
+  //cacheを取得しstrを配列に戻す.
+  cache = CacheService.getPublicCache();
+  
+  var data = cache.get("addShop")
+  
+  if(data==null){
+    return;
+  }else{
+    data = data.split(';');
+  }
+  
+  //cacheの競合が怖いのでなるべく早く消しておく
+  cache.remove("addShop");
+  
+  //配列の中身をstrからjsonに戻し，postMessageExecに投げる.
+  for(var i=0; i<data.length; i++){
+    data[i] = JSON.parse(data[i]);
+    addShopExec(data[i].user_name, data[i].product_name ,data[i].product_price ,data[i].product_stock ,data[i].product_imageurl);
+  }
+  return;
+}
+
+//Dialogに返す
+function addShopExec(user_name, product_name, product_price, product_stock, product_imageurl) {
+  // slack channel url (where to send the message)
+  var slackUrl = PropertiesService.getScriptProperties().getProperty('SLACK_INCOMMING_URL');
+  
+  //画像URLが入力されていない場合はGoogle画像検索から持ってくる
+  if (product_imageurl == "Google") {
+    var product_imageurl = getGoogleCustomSearchImage(product_name);
   }
 
   // message text  

@@ -53,4 +53,5 @@ function add_menu() {
   };
   // post to Slack
   var message = UrlFetchApp.fetch(slackUrl, options);
+  Logger.log(message);
 }

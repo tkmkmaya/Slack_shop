@@ -1,7 +1,9 @@
-//cacheにtransMoneyのキューを追加する.
-function transMoney(recvId, sendId, value){
-  cache = CacheService.getPublicCache();
-  var data = cache.get("transMoney");
+function getCache(key){  
+  cache = CacheService.getScriptCache();
+  var data = cache.get(key);
+  
+  //cacheの競合が怖いのでなるべく早く消しておく
+  cache.remove(key);
   
   //cacheの中身がnullならば空配列に，nullでないならstrを配列に変換する.
   if(data==null){
@@ -9,6 +11,13 @@ function transMoney(recvId, sendId, value){
   }else{
     data = data.split(';');
   }
+  
+  return data;
+}
+
+//cacheにtransMoneyのキューを追加する.
+function transMoney(recvId, sendId, value){
+  var data = getCache("transMoney");
   
   var newData = {
     "recvId": recvId,
@@ -19,7 +28,8 @@ function transMoney(recvId, sendId, value){
   //オブジェクトであるnewDataをstrに変換して配列に追加.
   data.push(JSON.stringify(newData));
   
-  //配列を;で分割するstrに変換.
+  //配列を;で分割するstrに変換してcacheに格納
+  cache = CacheService.getScriptCache();
   cache.put("transMoney", data.join(';'), 60*2); 
 }
 
@@ -28,19 +38,8 @@ function timeDrivenTransMoney(){
   //get slack access token from properties.
   var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
   
-  //cacheを取得しstrを配列に戻す.
-  cache = CacheService.getPublicCache();
-  
-  var data = cache.get("transMoney")
-  
-  if(data==null){
-    return;
-  }else{
-    data = data.split(';');
-  }
-  
-  //cacheの競合が怖いのでなるべく早く消しておく
-  cache.remove("transMoney");
+  //cacheを取得
+  var data = getCache("transMoney");
   
   //配列の中身をstrからjsonに戻し，postMessageExecに投げる.
   for(var i=0; i<data.length; i++){
@@ -58,9 +57,7 @@ function transMoneyExec(recvId, sendId, value) {
   } 
   
   //ユーザー情報はキャッシュに残っていれば活用
-  cache = CacheService.getPublicCache();
-  //cache.remove(recvId);
-  //cache.remove(sendId);
+  cache = CacheService.getScriptCache();
   var recvInfo = JSON.parse(cache.get(recvId));
   var sendInfo = JSON.parse(cache.get(sendId));
   
@@ -100,7 +97,7 @@ function transMoneyExec(recvId, sendId, value) {
 }
 
 function addMoney(userId, value) {
-  cache = CacheService.getPublicCache();
+  cache = CacheService.getScriptCache();
   var userInfo = JSON.parse(cache.get(userId));
   
   //get user information in JSON.
@@ -112,9 +109,10 @@ function addMoney(userId, value) {
     var userIdList = sheet.getSheetValues(1, 1, lastrow, 1);
     var moneyList = sheet.getSheetValues(1, 2, lastrow, 1);
     var userInfo = getInfo(userId, userIdList, moneyList);
-    userInfo.money = parseInt(userInfo.money) + parseInt(value);
-    cache.put(userId, JSON.stringify(userInfo), 60*60*24);
   }
+  
+  userInfo.money = parseInt(userInfo.money) + parseInt(value);
+  cache.put(userId, JSON.stringify(userInfo), 60*60*24);
   
   //spreadSheetに増額後の値を入力
   sheet.getRange(userInfo.sheetMoneyAddress).setValue(userInfo.money);
@@ -124,7 +122,7 @@ function addMoney(userId, value) {
 }
 
 function subMoney(userId, value) {  
-  cache = CacheService.getPublicCache();
+  cache = CacheService.getScriptCache();
   var userInfo = JSON.parse(cache.get(userId));
   
   //get user information in JSON.

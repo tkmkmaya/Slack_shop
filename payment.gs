@@ -121,6 +121,51 @@ function addMoney(userId, value) {
   postMessage("#money_log","[入金]<@"+userId+">残高:"+userInfo.money+"[+"+value+"]");
 }
 
+//SlackのWebAPIを叩く.
+function postMessage(id,message){
+  //get slack access token from properties.
+  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  var slackUrl = "https://slack.com/api/chat.postMessage"
+  
+  var options = {
+    method: 'post',
+    payload: {
+      "token": slack_access_token,
+      "channel": id,
+      "text": message,
+      "username": "ISDLのウィーゴ",
+      "icon_url": "http://www.hasegawa-model.co.jp/hsite/wp-content/uploads/2016/04/cw12p5.jpg",
+      "link_names": 1
+    },
+  };
+  
+  // post to Slack
+  UrlFetchApp.fetch(slackUrl, options);
+}
+
+function arrayParse(array) {
+  var parseArray = [];
+  for (var i = 0; i < array.length; i++) {
+    parseArray[i] = array[i][0];
+  }
+  return parseArray;
+}
+
+function getInfo(userId, userIdList, moneyList){                  
+  var indexNum = arrayParse(userIdList).indexOf(userId);
+  var money = moneyList[indexNum];
+  
+  //JSONにして返す
+  var info = {
+    "userId": userId,
+    "money": money,
+    "indexNum": indexNum,
+    "sheetMoneyAddress": "B"+(indexNum+1),
+  }     
+  
+  return info;
+}
+
 /**　減額処理は現在使っていないのでサポートしない
 function subMoney(userId, value) {  
   cache = CacheService.getScriptCache();
@@ -150,26 +195,5 @@ function subMoney(userId, value) {
 }
 **/
 
-function arrayParse(array) {
-  var parseArray = [];
-  for (var i = 0; i < array.length; i++) {
-    parseArray[i] = array[i][0];
-  }
-  return parseArray;
-}
 
-function getInfo(userId, userIdList, moneyList){                  
-  var indexNum = arrayParse(userIdList).indexOf(userId);
-  var money = moneyList[indexNum];
-  
-  //JSONにして返す
-  var info = {
-    "userId": userId,
-    "money": money,
-    "indexNum": indexNum,
-    "sheetMoneyAddress": "B"+(indexNum+1),
-  }     
-  
-  return info;
-}
 

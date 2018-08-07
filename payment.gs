@@ -121,6 +121,7 @@ function addMoney(userId, value) {
   postMessage("#money_log","[入金]<@"+userId+">残高:"+userInfo.money+"[+"+value+"]");
 }
 
+/**　減額処理は現在使っていないのでサポートしない
 function subMoney(userId, value) {  
   cache = CacheService.getScriptCache();
   var userInfo = JSON.parse(cache.get(userId));
@@ -147,6 +148,7 @@ function subMoney(userId, value) {
   }
   postMessage("#money_log","[出金]"+userInfo.userName+"残高:"+userInfo.money+"[-"+value+"]");
 }
+**/
 
 function arrayParse(array) {
   var parseArray = [];

@@ -1,22 +1,5 @@
 //資金処理のための関数群
 
-function getCache(key){  
-  cache = CacheService.getScriptCache();
-  var data = cache.get(key);
-  
-  //cacheの競合が怖いのでなるべく早く消しておく
-  cache.remove(key);
-  
-  //cacheの中身がnullならば空配列に，nullでないならstrを配列に変換する.
-  if(data==null){
-    data = [];
-  }else{
-    data = data.split(';');
-  }
-  
-  return data;
-}
-
 //cacheにtransMoneyのキューを追加する.
 function transMoney(recvId, sendId, value){
   var data = getCache("transMoney");
@@ -89,13 +72,28 @@ function transMoneyExec(recvId, sendId, value) {
   sheet.getRange(recvInfo.sheetMoneyAddress).setValue(recvInfo.money);
   sheet.getRange(sendInfo.sheetMoneyAddress).setValue(sendInfo.money);
   
-  if(recvId!="U3QC336UR"){
-    postMessage("@"+recvId,"残高:"+recvInfo.money+"[+"+value+"円]");
-  }
+  postMessage("@"+recvId,"残高:"+recvInfo.money+"[+"+value+"円]");
   postMessage("@"+sendId,"残高:"+sendInfo.money+"[-"+value+"円]");
   postMessage("#money_log","[送金]<@"+sendId+">-><@"+recvId+">["+value+"円]");
   
   return;
+}
+
+function getCache(key){  
+  cache = CacheService.getScriptCache();
+  var data = cache.get(key);
+  
+  //cacheの競合が怖いのでなるべく早く消しておく
+  cache.remove(key);
+  
+  //cacheの中身がnullならば空配列に，nullでないならstrを配列に変換する.
+  if(data==null){
+    data = [];
+  }else{
+    data = data.split(';');
+  }
+  
+  return data;
 }
 
 function addMoney(userId, value) {

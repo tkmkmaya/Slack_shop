@@ -1,3 +1,30 @@
+//SlackのWebAPIを叩く.
+function postMessage(id,message){
+  //get slack access token from properties.
+  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+  var slackUrl = "https://slack.com/api/chat.postMessage"
+  
+  var options = {
+    method: 'post',
+    payload: {
+      "token": slack_access_token,
+      "channel": id,
+      "text": message,
+      "username": "ISDLのウィーゴ",
+      "icon_url": "http://www.hasegawa-model.co.jp/hsite/wp-content/uploads/2016/04/cw12p5.jpg",
+      "link_names": 1
+    },
+  };
+  
+  // post to Slack
+  UrlFetchApp.fetch(slackUrl, options);
+}
+
+function test(){
+  postMessage("U3R2MUQQJ","test")
+}
+
+//postMessageを非同期化するよりはもっと大枠で非同期化する方が良かったので
 /**
 //cacheにpostMessageのキューを追加する.
 function postMessage(id,message){
@@ -52,30 +79,3 @@ function timeDrivenPostMessage(){
   return;
 }
 **/
-
-//SlackのWebAPIを叩く.
-function postMessage(id,message){
-  //get slack access token from properties.
-  var slack_access_token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
-  var slackUrl = "https://slack.com/api/chat.postMessage"
-  
-  var options = {
-    method: 'post',
-    payload: {
-      "token": slack_access_token,
-      "channel": id,
-      "text": message,
-      "username": "ISDLのウィーゴ",
-      "icon_url": "http://www.hasegawa-model.co.jp/hsite/wp-content/uploads/2016/04/cw12p5.jpg",
-      "link_names": 1
-    },
-  };
-  
-  // post to Slack
-  UrlFetchApp.fetch(slackUrl, options);
-}
-
-function test(){
-  postMessage("U3R2MUQQJ","test")
-}
-

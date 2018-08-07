@@ -1,3 +1,4 @@
+//Actionsコマンドを受け取った時の処理
 function action(json) {
   var message = json.message;
   var ts = message.ts;

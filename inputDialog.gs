@@ -1,3 +1,5 @@
+//menuから入金ボタンを押された時の処理
+
 function sendInputDialog(trigger_id) {
   // slack channel url (where to send the message)
   var slackUrl = "https://slack.com/api/dialog.open";

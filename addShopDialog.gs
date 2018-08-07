@@ -1,3 +1,5 @@
+//menuから商品追加ボタンを押された時の処理
+
 function sendAddShopDialog(trigger_id) {
   // slack channel url (where to send the message)
   var slackUrl = "https://slack.com/api/dialog.open"

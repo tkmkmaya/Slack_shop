@@ -1,3 +1,5 @@
+//資金処理のための関数群
+
 function getCache(key){  
   cache = CacheService.getScriptCache();
   var data = cache.get(key);

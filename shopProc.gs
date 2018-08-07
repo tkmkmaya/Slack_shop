@@ -1,3 +1,5 @@
+//doPost()へのJSONが商品の購入によるものだった場合のファイル
+
 function shop(json) {
   var originalMessage = json.original_message;
   

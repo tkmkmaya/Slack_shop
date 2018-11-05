@@ -36,7 +36,7 @@ function sendInputDialog(trigger_id) {
   return UrlFetchApp.fetch(slackUrl, options);
 }
 
-function input(json) {    
+function input(json) {
   var customerId = json.user.id;
   var price = parseInt(json.submission.input_price);
   

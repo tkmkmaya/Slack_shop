@@ -47,7 +47,15 @@ function action(json) {
   //投稿
   if(json.callback_id!="product_delete"){
     var slackUrl = PropertiesService.getScriptProperties().getProperty('SLACK_INCOMMING_URL');
-    res_fetch(slackUrl, message);
+    // format for Slack
+    var options = {
+      'method': 'post',
+      'contentType': 'application/json',
+      // Convert the JavaScript object to a JSON string.
+      'payload': JSON.stringify(message)
+    };
+    // post to Slack
+    UrlFetchApp.fetch(slackUrl, options);
   }
   chatDelete(ts);
 }

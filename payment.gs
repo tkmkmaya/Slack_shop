@@ -47,8 +47,8 @@ function transMoneyExec(recvId, sendId, value) {
   var sendInfo = JSON.parse(cache.get(sendId));
   
   //get user information in JSON.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
-  var sheet = SpreadsheetApp.openById(sheet_id);
+  var SHEET_ID = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  var sheet = SpreadsheetApp.openById(SHEET_ID);
   
   if((recvInfo==null)||(sendInfo==null)){
     var lastrow = sheet.getLastRow();
@@ -101,7 +101,7 @@ function addMoney(userId, value) {
   var userInfo = JSON.parse(cache.get(userId));
   
   //get user information in JSON.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
+  var sheet_id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   var sheet = SpreadsheetApp.openById(sheet_id);
   
   if(userInfo==null){
@@ -172,7 +172,7 @@ function subMoney(userId, value) {
   var userInfo = JSON.parse(cache.get(userId));
   
   //get user information in JSON.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('sheet_id');
+  var sheet_id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   var sheet = SpreadsheetApp.openById(sheet_id);
   
   if(userInfo==null){

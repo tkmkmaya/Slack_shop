@@ -18,3 +18,23 @@ Slack Shopとは，GASによって特定のグループ上で電子マネーシ�
 ## Author
 
 [@iwa0125](https://twitter.com/iwa0125)
+
+# How to
+
+## 何これ？ / What's this?
+Slack上で電子マネーを使って買い物ができるサービスです！
+
+This is a service that you can buy and sell using ISDL e-money on the Slack!
+## どうやって入金するの？ / How to top up my e-money
+Shopチャンネル最下部の入金ボタンに金額を入力して，所定の場所に現金を入れてね！
+
+Please click the '入金' button at the bottom of #shop and input the amount. And please put cash in the box on the desk.
+## どうやって買うの？ / How to buy
+Shopチャンネルで欲しい商品の金額ボタンを押すだけでOK!
+
+In the #shop, Just click the button of the item you want!
+
+## どうやって売るの？ / How to sell
+#shop 最下部の出品ボタンから，商品名と価格，在庫数を入力してください！ 画像URLは入力が無かった場合Google検索から自動的に持ってきます！
+
+Please click on the '出品' button at the bottom of #shop, enter the item name and price, stock number! When there is no input of the image URL, it is automatically acquired from Google image search.

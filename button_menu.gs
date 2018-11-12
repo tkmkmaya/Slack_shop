@@ -7,8 +7,10 @@ function menu(json){
     
   }if(json.actions[0].name == "addShopDialog"){
     sendAddShopDialog(json.trigger_id);
+    
+  }if(json.actions[0].name == "register_button"){
+    register(json.user.id)
   }
-  
   return json.original_message;
 }
 
@@ -38,9 +40,14 @@ function add_menu() {
         "value": "transDialog",
       },{
         "name": "addShopDialog",
-        "text": "商品追加",
+        "text": "出品",
         "type": "button",
         "value": "addShopDialog"
+      },{
+        "name": "register_button",
+        "text": "ユーザ登録",
+        "type": "button",
+        "value": "register_button"
       }]
     }]
   }

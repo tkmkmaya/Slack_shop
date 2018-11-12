@@ -72,9 +72,9 @@ function transMoneyExec(recvId, sendId, value) {
   sheet.getRange(recvInfo.sheetMoneyAddress).setValue(recvInfo.money);
   sheet.getRange(sendInfo.sheetMoneyAddress).setValue(sendInfo.money);
   
-  postMessage("@"+recvId,"残高:"+recvInfo.money+"[+"+value+"円]");
-  postMessage("@"+sendId,"残高:"+sendInfo.money+"[-"+value+"円]");
-  postMessage("#money_log","[送金]<@"+sendId+">-><@"+recvId+">["+value+"円]");
+  postMessage("@"+recvId,"残高:¥"+recvInfo.money+"[+¥"+value+"<-<@"+sendId+">]");
+  postMessage("@"+sendId,"残高:¥"+sendInfo.money+"[-¥"+value+"-><@"+recvId+">]");
+  postMessage("#money_log","[送金]<@"+sendId+">-><@"+recvId+">[¥"+value+"]");
   
   return;
 }

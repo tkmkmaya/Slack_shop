@@ -14,10 +14,16 @@ function shop(json) {
     transMoney(sellerId, customerId, price);
     
     //decrement stock num.
-    product_info.fields[0].value--; 
+    product_info.fields[0].value--;
+    if(product_info.fields[0].value == 0){
+      product_info.image_url = "";
+      product_info.actions[0].text = "販売終了";
+      product_info.actions[0].value = 0;
+    }
   }
   
   return originalMessage;
 }
 
 
+   

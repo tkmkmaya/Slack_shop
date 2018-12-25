@@ -5,6 +5,10 @@
       "userSymbol": "SlackApp",
       "libraryId": "1on93YOYfSmV92R5q59NpKmsyWIQD8qnoLYk-gkQBI92C58SPyA2x1-bq",
       "version": "22"
+    }, {
+      "userSymbol": "SpreadSheetsSQL",
+      "libraryId": "17p1ghyOkbWOhdE4bdBFhOXL079I-yt5xd0LAi00Zs5N-bUzpQtN7iT1a",
+      "version": "9"
     }]
   },
   "webapp": {

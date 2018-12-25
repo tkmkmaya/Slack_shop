@@ -4,6 +4,9 @@
 //SHOP_CHANNEL_ID: shop channel's id
 //sheet_id          : Google SpreadSheet ID for 残高リスト
 
+//GAS Libraries
+//SpreadSheetSQL: MAoZrMsylZMiNUMljU4QtRHEMpGMKinCk
+
 //以下は商品追加でGoogle検索から持ってくる際のもの
 //GOOGLE_API_KEY
 //GOOGLE_CSE_ID

@@ -1,12 +1,13 @@
 //資金処理のための関数群
 
 //cacheにtransMoneyのキューを追加する.
-function transMoney(recvId, sendId, value){
+function transMoney(recvId, sendId, productName, value){
   var data = getCache("transMoney");
   
   var newData = {
     "recvId": recvId,
     "sendId": sendId,
+    "productName": productName,
     "value": value
   }
   
@@ -29,52 +30,42 @@ function timeDrivenTransMoney(){
   //配列の中身をstrからjsonに戻し，postMessageExecに投げる.
   for(var i=0; i<data.length; i++){
     data[i] = JSON.parse(data[i]);
-    transMoneyExec(data[i].recvId,data[i].sendId, data[i].value);
+    transMoneyExec(data[i].recvId, data[i].sendId, data[i].productName, data[i].value);
   }
   return;
 }
 
-function transMoneyExec(recvId, sendId, value) {  
+function transMoneyExec(recvId, sendId, productName, value) {  
   //出品者自身の商品を買った場合の例外処理
   if(recvId == sendId){
     postMessage("@"+recvId,"出品者自身の購入のため、処理は行いませんでした。["+value+"円]");
     return;
   } 
   
-  //ユーザー情報はキャッシュに残っていれば活用
-  cache = CacheService.getScriptCache();
-  var recvInfo = JSON.parse(cache.get(recvId));
-  var sendInfo = JSON.parse(cache.get(sendId));
+  var memberSheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   
-  //get user information in JSON.
-  var SHEET_ID = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  var sheet = SpreadsheetApp.openById(SHEET_ID);
+  var recvInfo = arrayFormat(SpreadSheetsSQL.open(memberSheetId, "sheet1").select(['id', 'price', 'name']).filter("id = " + recvId).result());
+  var sendInfo = arrayFormat(SpreadSheetsSQL.open(memberSheetId, "sheet1").select(['id', 'price', 'name']).filter("id = " + sendId).result());
   
-  if((recvInfo==null)||(sendInfo==null)){
-    var lastrow = sheet.getLastRow();
-    var userIdList = sheet.getSheetValues(1, 1, lastrow, 1);
-    var moneyList = sheet.getSheetValues(1, 2, lastrow, 1);
-  }
-    
-  if(recvInfo==null){
-    var recvInfo = getInfo(recvId, userIdList, moneyList);
-  }
-  recvInfo.money = parseInt(recvInfo.money) + parseInt(value);
-  cache.put(recvId, JSON.stringify(recvInfo), 60*60*24);
+  recvInfo.price = parseInt(recvInfo.price) + parseInt(value);
+  sendInfo.price = parseInt(sendInfo.price) - parseInt(value);
+ 
+  SpreadSheetsSQL.open(memberSheetId, "sheet1").updateRows({price: recvInfo.price}, "id = "+recvId);
+  SpreadSheetsSQL.open(memberSheetId, "sheet1").updateRows({price: sendInfo.price}, "id = "+sendId);
+      
+  //Logに出力
+  var logSheetId = PropertiesService.getScriptProperties().getProperty('LOG_SHEET_ID');
+  var date = Utilities.formatDate(new Date(), "JST", "yyyy/MM/dd/HH/mm");
   
-  if(sendInfo==null){
-    var sendInfo = getInfo(sendId, userIdList, moneyList);
-  }
-  sendInfo.money = parseInt(sendInfo.money) - parseInt(value);
-  cache.put(sendId, JSON.stringify(sendInfo), 60*60*24);
-  
-  //spreadSheetに増減後の値を入力
-  sheet.getRange(recvInfo.sheetMoneyAddress).setValue(recvInfo.money);
-  sheet.getRange(sendInfo.sheetMoneyAddress).setValue(sendInfo.money);
-  
-  postMessage("@"+recvId,"残高:¥"+recvInfo.money+"[+¥"+value+"<-<@"+sendId+">]");
-  postMessage("@"+sendId,"残高:¥"+sendInfo.money+"[-¥"+value+"-><@"+recvId+">]");
-  postMessage("#money_log","[送金]<@"+sendId+">-><@"+recvId+">[¥"+value+"]");
+  SpreadSheetsSQL.open(logSheetId, "sheet1").insertRows([
+      {date: date, productName: productName, recvId: recvInfo.name, sendId: sendInfo.name, price: value},
+  ]);
+  //Logここまで
+ 
+  //Slackに投稿
+  postMessage("@" + recvId, "[販売]" + productName + " / 残高:¥" + recvInfo.price + "(+" + value + ") <- <@" + sendId + ">");
+  postMessage("@" + sendId, "[購入]" + productName + " / 残高:¥" + sendInfo.price + "(-" + value + ") -> <@" + recvId + ">");
+  postMessage("#money_log","[送金]" + productName + " <@" + sendId + "> -> <@" + recvId + ">[¥" + value + "]");
   
   return;
 }
@@ -94,31 +85,6 @@ function getCache(key){
   }
   
   return data;
-}
-
-function addMoney(userId, value) {
-  cache = CacheService.getScriptCache();
-  var userInfo = JSON.parse(cache.get(userId));
-  
-  //get user information in JSON.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  var sheet = SpreadsheetApp.openById(sheet_id);
-  
-  if(userInfo==null){
-    var lastrow = sheet.getLastRow();
-    var userIdList = sheet.getSheetValues(1, 1, lastrow, 1);
-    var moneyList = sheet.getSheetValues(1, 2, lastrow, 1);
-    var userInfo = getInfo(userId, userIdList, moneyList);
-  }
-  
-  userInfo.money = parseInt(userInfo.money) + parseInt(value);
-  cache.put(userId, JSON.stringify(userInfo), 60*60*24);
-  
-  //spreadSheetに増額後の値を入力
-  sheet.getRange(userInfo.sheetMoneyAddress).setValue(userInfo.money);
-    
-  postMessage("@"+userId,"残高:"+userInfo.money+"[+"+value+"]");
-  postMessage("#money_log","[入金]<@"+userId+">残高:"+userInfo.money+"[+"+value+"]");
 }
 
 //SlackのWebAPIを叩く.
@@ -143,6 +109,10 @@ function postMessage(id,message){
   UrlFetchApp.fetch(slackUrl, options);
 }
 
+function arrayFormat(array){
+  return array[0]
+}
+
 function arrayParse(array) {
   var parseArray = [];
   for (var i = 0; i < array.length; i++) {
@@ -150,50 +120,4 @@ function arrayParse(array) {
   }
   return parseArray;
 }
-
-function getInfo(userId, userIdList, moneyList){                  
-  var indexNum = arrayParse(userIdList).indexOf(userId);
-  var money = moneyList[indexNum];
-  
-  //JSONにして返す
-  var info = {
-    "userId": userId,
-    "money": money,
-    "indexNum": indexNum,
-    "sheetMoneyAddress": "B"+(indexNum+1),
-  }     
-  
-  return info;
-}
-
-/**　減額処理は現在使っていないのでサポートしない
-function subMoney(userId, value) {  
-  cache = CacheService.getScriptCache();
-  var userInfo = JSON.parse(cache.get(userId));
-  
-  //get user information in JSON.
-  var sheet_id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  var sheet = SpreadsheetApp.openById(sheet_id);
-  
-  if(userInfo==null){
-    var lastrow = sheet.getLastRow();
-    var userIdList = sheet.getSheetValues(1, 1, lastrow, 1);
-    var moneyList = sheet.getSheetValues(1, 2, lastrow, 1);
-    var userInfo = getInfo(userId, userIdList, moneyList);
-    userInfo.money = parseInt(userInfo.money) - value;
-    cache.put(userId, JSON.stringify(userInfo), 60*60*24);
-  }
-  
-  //spreadSheetに増額後の値を入力
-  sheet.getRange(userInfo.sheetMoneyAddress).setValue(parseInt(userInfo.money) - parseInt(value));
-    
-  postMessage("@"+userId,"残高:"+userInfo.money+"[-"+value+"]");
-  if(money < 0){
-    postMessage("@"+userId,"残高がマイナスです。本システムは融資ではありません。");
-  }
-  postMessage("#money_log","[出金]"+userInfo.userName+"残高:"+userInfo.money+"[-"+value+"]");
-}
-**/
-
-
 

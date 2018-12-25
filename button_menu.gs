@@ -23,7 +23,8 @@ function add_menu() {
   // message text  
   var messageData = {
     "attachments": [{
-      "title": "ISDL SHOP MENU",
+      "title": "ISDL Shop Portal",
+      "title_link": "https://datastudio.google.com/u/0/reporting/1xFNk0hUFC6B37aKrJW81dATzDJ2HGd6N/page/ofge",
       "fallback": "Sorry, no support for buttons.",
       "callback_id": "trigger_menu",
       "color": "#3AA3E3",

@@ -69,6 +69,21 @@ function transMoneyExec(recvId, sendId, productName, value) {
   
   return;
 }
+    
+function addMoney(recvId, value) {  
+
+  var memberSheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID'); 
+  var recvInfo = arrayFormat(SpreadSheetsSQL.open(memberSheetId, "sheet1").select(['id', 'price', 'name']).filter("id = " + recvId).result());
+  
+  recvInfo.price = parseInt(recvInfo.price) + parseInt(value);
+  SpreadSheetsSQL.open(memberSheetId, "sheet1").updateRows({price: recvInfo.price}, "id = "+recvId);     
+ 
+  //Slackに投稿
+  postMessage("@" + recvId, "[入金] 残高:¥" + recvInfo.price + "(+" + value + ")");
+  postMessage("#money_log","[入金] <@" + recvId + ">[¥" + value + "]");
+  
+  return;
+}
 
 function getCache(key){  
   cache = CacheService.getScriptCache();
